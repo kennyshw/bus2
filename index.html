@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Arrivals</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #f8f8f8;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 2px solid #eee;
+        }
+        td {
+            padding: 14px 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .bus-number {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1a73e8;
+        }
+        .arrival-time {
+            color: #188038;
+            font-weight: 500;
+        }
+        .stop-name {
+            color: #666;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        @media (max-width: 350px) {
+            td, th {
+                font-size: 13px;
+                padding: 10px 6px;
+            }
+            .bus-number {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Bus</th>
+                <th>Stop</th>
+                <th>Next</th>
+                <th>After</th>
+            </tr>
+        </thead>
+        <tbody id="busTimings">
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px;">Loading bus timings...</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        function formatTime(timestamp) {
+            if (!timestamp) return '-';
+            const arrival = new Date(timestamp);
+            const now = new Date();
+            const diffMinutes = Math.floor((arrival - now) / 60000);
+            
+            if (diffMinutes <= 0) return '0';
+            return `${diffMinutes}`;
+        }
+
+        async function fetchBusTimings() {
+            const tbody = document.getElementById('busTimings');
+
+            try {
+                const response = await fetch('/api/bus-arrivals');
+                
+                if (!response.ok) throw new Error('Failed to fetch bus timings');
+                
+                const data = await response.json();
+                tbody.innerHTML = '';
+                
+                if (data.Services.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 20px; color: #666;">
+                                No buses currently available
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const sortedServices = data.Services.sort((a, b) => {
+                    // Sort by bus number first
+                    return a.ServiceNo.localeCompare(b.ServiceNo, undefined, { numeric: true });
+                });
+
+                sortedServices.forEach(service => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="bus-number">${service.ServiceNo}</td>
+                        <td class="stop-name">${service.BusStopName}</td>
+                        <td class="arrival-time">${formatTime(service.NextBus.EstimatedArrival)}</td>
+                        <td class="arrival-time">${formatTime(service.NextBus2.EstimatedArrival)}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: #d32f2f; padding: 20px;">
+                            Failed to load bus timings
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        fetchBusTimings();
+        setInterval(fetchBusTimings, 30000);
+    </script>
+</body>
+</html>
