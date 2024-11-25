@@ -9,14 +9,14 @@ app.use(cors());
 // Enhanced configuration mapping services to their relevant stops
 const config = {
     serviceStops: {
-        '243W': ['27399'], // Example: 243W only checks at Blk 859 and Koufu
-        '258': ['27399'], // 258 checks at three stops
-        '181': ['27431', '22009'], // 181 only checks at Boon Lay
-        '974': ['27101'], // 974 checks at Admiralty MRT and 676A
+        '243W': ['27399'], 
+        '258': ['27399'], 
+        '181': ['27431', '22009'],
+        '974': ['27101'], 
         '243G': ['22009'],
         '811': ['59211', '59159'],
         '811T': ['59211'],
-        '861': ['59211', '58541'],
+        '861': ['59211'],
         '965': ['59261'],
         '901M': ['46779', '46759', '47491', '47499']
     },
@@ -25,15 +25,14 @@ const config = {
         '27399': 'B859',
         '27431': 'Koufu',
         '27101': 'O. WWSS',
-        '22009': 'Boon Lay',
+        '22009': 'BL',
         '59211': 'J House',
         '59261': 'B174',
-        '46779': 'Adm MRT',
+        '46779': 'Adm',
         '46759': '676A',
         '47491': 'Twin F',
         '47499': 'ASM',
-        '59159': 'YS MRT',
-        '58541': 'O. CB MRT'
+        '59159': 'YS',
     }
 };
 
