@@ -42,7 +42,8 @@
         }
         .arrival-time {
             color: #188038;
-            font-weight: 500;
+            font-weight: bold;
+            font-size: 16px;
         }
         .stop-name {
             color: #666;
@@ -85,7 +86,7 @@
             const now = new Date();
             const diffMinutes = Math.floor((arrival - now) / 60000);
             
-            if (diffMinutes <= 0) return '0';
+            if (diffMinutes <= 0) return 'Arr';
             return `${diffMinutes}`;
         }
 
